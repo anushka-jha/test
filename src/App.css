@@ -1,0 +1,99 @@
+/* src/App.css */
+body {
+  font-family: 'Comic Sans MS', cursive;
+  margin: 20px;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 50px;
+  margin-right: 10px;
+  margin-top: 2rem;
+}
+
+.app-header div {
+  flex: 1;
+}
+
+.app-header h1 {
+  font-size: 36px;
+  margin-bottom: 5px;
+}
+
+.app-header p {
+  font-size: 16px;
+  margin: 0;
+}
+
+.tagline-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.tagline-content {
+  max-width: 50%;
+}
+
+.tagline {
+font-size: 40px;
+  font-style: italic;
+  margin-bottom: 30px;
+}
+
+button {
+  padding: 10px;
+  background: linear-gradient(to right, rgb(58, 85, 163), rgb(29, 43, 82));
+  /* Gradient background */
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  /* Smooth transition on hover */
+}
+
+button:hover {
+  background-color: rgb(29, 43, 82);
+    transform: scale(1.05);
+    /* Slightly increase size on hover */
+}
+
+.cover-img {
+  max-width: 30%;
+  height: auto;
+  margin-top: 20px;
+}
+
+.comic-form-section {
+  margin-top: 20px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.comic-display {
+  display: flex;
+  margin-top: 20px;
+}
+
+.comic-panel {
+  width: 100px;
+  margin-right: 10px;
+}
+
+.speech-bubble {
+  position: absolute;
+  padding: 8px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.8);
+}
