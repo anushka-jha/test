@@ -5,149 +5,107 @@ import ComicForm from "./components/ComicForm";
 import ComicPanel from "./components/ComicPanel";
 import SpeechBubble from "./components/SpeechBubble";
 
+
+const makeApiCall = async (data) => {
+  data = {"inputs" : data}
+  console.log("called api");
+  const response = await fetch(
+      "https://xdwvg9no7pefghrn.us-east-1.aws.endpoints.huggingface.cloud",
+      {
+          headers: {
+              "Accept": "image/png",
+              "Authorization": "Bearer VknySbLLTUjbxXAXCjyfaFIPwUTCeRXbFSOjwRiCxsxFyhbnGjSFalPKrpvvDAaPVzWEevPljilLVDBiTzfIbWFdxOkYJxnOPoHhkkVGzAknaOulWggusSFewzpqsNWM",
+              "Content-Type": "application/json"
+          },
+          method: "POST",
+          body: JSON.stringify(data),
+      }
+  );
+  console.log("response", response);
+  const result = await response.blob();
+  const imageURL = URL.createObjectURL(result);
+  return imageURL;
+};
+
 const App = () => {
-  const [comicPanels, setComicPanels] = useState([]);
   const [speechBubbles, setSpeechBubbles] = useState([]);
   const [showComicForm, setShowComicForm] = useState(false);
+  const [status, setStatus] = useState(Array(10).fill(false));
+
+  // make images an array of 10
+  const [ComicImages, setComicImages] = useState(Array(10).fill(""));
+  console.log("ComicImages", ComicImages);
   const comicFormRef = useRef(null);
+  const bg_img =
+    "https://file.notion.so/f/f/131d7e41-d82d-418c-9dda-51f55df96d2e/ed6247f0-c23e-435f-8a9c-eb9316996a1d/DALLE_2023-11-07_18.16.09_-_Craft_a_sophisticated_and_premium_image_that_represents_a_Comic_Creator_Web_App._Picture_an_ultra-modern_and_luxurious_artists_workspace_featuring.png?id=45dabf01-cc50-4d0a-9f65-d33cf7a522ae&table=block&spaceId=131d7e41-d82d-418c-9dda-51f55df96d2e&expirationTimestamp=1701165600000&signature=9MoqaSveiX-rJ3NXEUDgJX-fW7ZhyifkdUOLh4gm5iE&downloadName=DALL%C2%B7E+2023-11-07+18.16.09+-+Craft+a+sophisticated+and+premium+image+that+represents+a+%27Comic+Creator+Web+App%27.+Picture+an+ultra-modern+and+luxurious+artist%27s+workspace%2C+featuring.png";
 
   const handleComicSubmit = async (textInputs) => {
     try {
-      // Make API call with textInputs and get comic image URLs
-      const imageUrls = await makeApiCall(textInputs);
+      console.log("textInputs", textInputs);
 
-      // Update comic panels state
-      setComicPanels(imageUrls);
-
-      // Optional: Add speech bubbles
-      const newSpeechBubbles = textInputs.map((text, index) => ({
-        text,
-        position: { top: "50px", left: `${index * 100 + 20}px` },
-      }));
-      setSpeechBubbles(newSpeechBubbles);
-
-      // Move to the next section after generating the comic
-      setShowComicForm(false);
-
-      // Scroll to the ComicForm section
-      comicFormRef.current.scrollIntoView({ behavior: "smooth" });
+      textInputs.map(async (text, index) => {
+        if(!text) return;
+        let stat = [...status];
+        stat[index] = true;
+        setStatus(stat);
+        console.log("loading");
+        const imageURL = await makeApiCall(text);
+        stat[index] = false;
+        setStatus(stat);
+        console.log("Unloading");
+        images = [...ComicImages];
+        images[index] = imageURL;
+        setComicImages(images);
+      });
     } catch (error) {
       console.error("Error generating comic:", error.message);
     }
   };
 
   const handleStartMaking = () => {
-    // Show the ComicForm section
     setShowComicForm(true);
   };
 
   return (
     <div>
-      <header className="app-header">
-        <img
-          src={process.env.PUBLIC_URL + "/images/dashtoon-logo.jfif"}
-          alt="Dashtoon Logo"
-          className="logo"
-        />
-        <div>
-          <h1>DASHTOON</h1>
-          <p>The World's Best Comics Have a New Home</p>
-        </div>
-      </header>
-      <section className="tagline-section">
-        <div className="tagline-content">
-          <p className="tagline">Express your ideas and stories in comics.</p>
-          <button onClick={handleStartMaking}>Start Making</button>
-          {/* <button>Start Making</button> */}
-        </div>
-        <img
-          src={process.env.PUBLIC_URL + "/images/cover-img.jpg"}
-          alt="Cover Image"
-          className="cover-img"
-        />
-      </section>
-      {showComicForm && (
-        <section ref={comicFormRef} className="comic-form-section">
-          <ComicForm onSubmit={handleComicSubmit} />
-          <div className="comic-display">
-            {comicPanels.map((imageUrl, index) => (
-              <ComicPanel key={index} imageUrl={imageUrl} />
-            ))}
-            {speechBubbles.map((bubble, index) => (
-              <SpeechBubble
-                key={index}
-                text={bubble.text}
-                position={bubble.position}
-              />
-            ))}
+      <>
+        <header className="app-header">
+          <img src={bg_img} alt="Dashtoon Logo" className="logo" />
+          <div>
+            <h1>DASHTOON</h1>
+            <p>The World's Best Comics Have a New Home</p>
           </div>
+        </header>
+        <section className="tagline-section">
+          <div className="tagline-content">
+            <p className="tagline">Express your ideas and stories in comics.</p>
+            <button onClick={handleStartMaking}>Start Making</button>
+            {/* <button>Start Making</button> */}
+          </div>
+          <img src={bg_img} alt="Cover Image" className="cover-img" />
         </section>
-      )}
+        <section className="features-section">
+          {ComicImages.map((image, index) => {
+            if (image) {
+              return (
+                <>
+                  <h1>Panel {index + 1}</h1>
+                  <img src={image} alt="Comic Image" className="comic-img" />;
+                </>
+              );
+            }
+          })}
+        </section>
+        <>
+          {showComicForm && (
+            <section ref={comicFormRef} className="comic-form-section">
+              <ComicForm onSubmit={handleComicSubmit} status={status}/>
+            </section>
+          )}
+        </>
+      </>
     </div>
   );
-};
-
-// const makeApiCall = async (textInputs) => {
-//   const apiUrl =
-//     "https://xdwvg9no7pefghrn.us-east-1.aws.endpoints.huggingface.cloud"; // Replace with your actual backend API URL
-
-//   try {
-//     const response = await axios.post(
-//       apiUrl,
-//       {
-//         inputs: textInputs.join("\n"),
-//       },
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//       }
-//     );
-
-//     if (response.status !== 200) {
-//       console.error("Error generating comic. Status:", response.status);
-//       throw new Error("Error generating comic");
-//     }
-
-//     return response.data.imageUrls;
-//   } catch (error) {
-//     console.error("Error generating comic:", error.message);
-//     throw new Error("Error generating comic");
-//   }
-// };
-
-const makeApiCall = async (textInputs) => {
-  const apiUrl =
-    "https://xdwvg9no7pefghrn.us-east-1.aws.endpoints.huggingface.cloud"; // Replace with your actual backend API URL
-  const apiKey =
-    "VknySbLLTUjbxXAXCjyfaFIPwUTCeRXbFSOjwRiCxsxFyhbnGjSFalPKrpvvDAaPVzWEevPljilLVDBiTzfIbWFdxOkYJxnOPoHhkkVGzAknaOulWggusSFewzpqsNWM";
-
-  try {
-    const response = await axios.post(
-      apiUrl,
-      { inputs: textInputs.join("\n") },
-      {
-        headers: {
-          Accept: "image/png",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-      }
-    );
-
-    if (response.status !== 200) {
-      console.error("Error generating comic. Status:", response.status);
-      throw new Error("Error generating comic");
-    }
-
-    const imageBytes = await response.arrayBuffer();
-    const imageBlob = new Blob([imageBytes], { type: "image/png" });
-    const imageURL = URL.createObjectURL(imageBlob);
-    return imageURL;
-  } catch (error) {
-    console.error("Error generating comic:", error.message);
-    throw new Error("Error generating comic");
-  }
 };
 
 export default App;
