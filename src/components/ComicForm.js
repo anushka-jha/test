@@ -1,7 +1,7 @@
 // src/components/ComicForm.js
 import React, { useState } from "react";
 
-const ComicForm = ({ onSubmit }) => {
+const ComicForm = ({ onSubmit, status }) => {
   const [textInputs, setTextInputs] = useState(Array(10).fill(""));
 
   const handleInputChange = (index, value) => {
@@ -16,7 +16,7 @@ const ComicForm = ({ onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
       {textInputs.map((text, index) => (
         <div key={index}>
           <label>{`Panel ${index + 1}: `}</label>
@@ -25,10 +25,11 @@ const ComicForm = ({ onSubmit }) => {
             value={text}
             onChange={(e) => handleInputChange(index, e.target.value)}
           />
+          {status[index] && <span class="loader"></span>}
         </div>
       ))}
-      <button type="submit">Generate Comic</button>
-    </form>
+      <button onClick={handleSubmit}>Generate Comics</button>
+    </>
   );
 };
 
